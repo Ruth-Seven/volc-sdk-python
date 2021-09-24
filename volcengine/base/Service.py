@@ -26,22 +26,8 @@ class Service(object):
         self.init()
 
     def init(self):
-        if 'VOLC_ACCESSKEY' in os.environ and 'VOLC_SECRETKEY' in os.environ:
-            self.service_info.credentials.set_ak(os.environ['VOLC_ACCESSKEY'])
-            self.service_info.credentials.set_sk(os.environ['VOLC_SECRETKEY'])
-        else:
-            if os.environ.get('HOME', None) is None:
-                return
-
-            path = os.environ['HOME'] + '/.volc/config'
-            if os.path.isfile(path):
-                with open(path, 'r') as f:
-                    j = json.load(f)
-                    if 'ak' in j:
-                        self.service_info.credentials.set_ak(j['ak'])
-                    if 'sk' in j:
-                        self.service_info.credentials.set_sk(j['sk'])
-
+       pass 
+    
     def set_ak(self, ak):
         self.service_info.credentials.set_ak(ak)
 

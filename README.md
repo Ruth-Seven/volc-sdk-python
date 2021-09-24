@@ -30,24 +30,43 @@ require python verion >= 2.7
 
 [生成访问密匙](https://www.volcengine.cn/docs/6291/65578)
 
-### AK/SK在sdk中的使用
+### 配置及使用
+
+配置优先级从先到后，从高到低，包括了AK/SK在sdk中的使用，region设置：
 
 - (option 1 推荐) 在代码里显示调用方法set_ak/set_sk，例：
+
   ```python
       iam_service = IamService()
       # call below method if you dont set ak and sk in $HOME/.volc/config
       iam_service.set_ak('ak')
       iam_service.set_sk('sk')
   ```
+  
+- (option 2) 在当前环境变量中分别设置:
 
-- (option 2) 在当前环境变量中分别设置 
   ```bash
-  VOLC_ACCESSKEY="your ak"  
-  VOLC_SECRETKEY="your sk"
+export VOLC_ACCESS_KEY_ID="ak"
+export VOLC_SECRET_ACCESS_KEY="sk"
+export VOLC_REGION="region-1"
   ```
-- (option 3) json格式放在～/.volc/config中，格式为：
-  ```json
-    {"ak":"your ak","sk":"your sk"}
+
+- (option 3) 以 ini 格式放在`～/.volc/credentials`和`～/.volc/config`(默认)中，格式为：
+
+  `～/.volc/credentials`:
+  ```ini
+[default]
+access_key_id = test_key1
+secret_access_key = test_secret_key1
+  ```
+
+  `～/.volc/config`:
+
+  ```ini
+[default]
+
+[ml_platform]
+region = cn-beijing 
   ```
 
 ## 地域Region设置
