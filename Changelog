@@ -34,7 +34,7 @@ livesaas: add async sdk
 - Fixed base json for dict type
 
 2021-06-03 Bumped to version v1.0.15
-- Hotfix for vod service 
+- Hotfix for vod service
 
 2021-06-02 Bumped to version v1.0.14
 - Add get media list

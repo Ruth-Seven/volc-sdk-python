@@ -3,7 +3,7 @@
 # DO NOT EDIT!
 # coding:utf-8
 from __future__ import print_function
-from volcengine.Policy import *
+import volcengine.Policy as *
 from google.protobuf.json_format import *
 from volcengine.vod.VodServiceConfig import VodServiceConfig
 from retry import retry

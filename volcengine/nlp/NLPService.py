@@ -1,10 +1,9 @@
-# coding:utf-8
 import json
 import threading
 
 from volcengine.ApiInfo import ApiInfo
-from volcengine.Credentials import Credentials
 from volcengine.base.Service import Service
+from volcengine.Credentials import Credentials
 from volcengine.ServiceInfo import ServiceInfo
 
 
@@ -21,24 +20,71 @@ class NLPService(Service):
     def __init__(self):
         self.service_info = NLPService.get_service_info()
         self.api_info = NLPService.get_api_info()
-        super(NLPService, self).__init__(self.service_info, self.api_info)
+        super().__init__(self.service_info, self.api_info)
 
     @staticmethod
     def get_service_info():
-        service_info = ServiceInfo("open.volcengineapi.com", {},
-                                   Credentials('', '', 'nlp_gateway', 'cn-north-1'), 10, 10)
+        service_info = ServiceInfo(
+            "open.volcengineapi.com",
+            {},
+            Credentials("", "", "nlp_gateway", "cn-north-1"),
+            10,
+            10,
+        )
         return service_info
 
     @staticmethod
     def get_api_info():
         api_info = {
-            "KeyphraseExtractionExtract": ApiInfo("POST", "/", {"Action": "KeyphraseExtractionExtract", "Version": "2020-09-01"}, {}, {}),
-            "TextCorrectionZhCorrect": ApiInfo("POST", "/", {"Action": "TextCorrectionZhCorrect", "Version": "2020-09-01"}, {}, {}),
-            "TextCorrectionEnCorrect": ApiInfo("POST", "/", {"Action": "TextCorrectionEnCorrect", "Version": "2020-09-01"}, {}, {}),
-            "SentimentAnalysis": ApiInfo("POST", "/", {"Action": "SentimentAnalysis", "Version": "2020-12-01"}, {}, {}),
-            "TextSummarization": ApiInfo("POST", "/", {"Action": "TextSummarization", "Version": "2020-12-01"}, {}, {}),
-            "EssayAutoGrade": ApiInfo("POST", "/", {"Action": "EssayAutoGrade", "Version": "2021-05-20"}, {}, {}),
-            "NovelCorrection": ApiInfo("POST", "/", {"Action": "NovelCorrection", "Version": "2021-07-22"}, {}, {}),
+            "KeyphraseExtractionExtract": ApiInfo(
+                "POST",
+                "/",
+                {"Action": "KeyphraseExtractionExtract", "Version": "2020-09-01"},
+                {},
+                {},
+            ),
+            "TextCorrectionZhCorrect": ApiInfo(
+                "POST",
+                "/",
+                {"Action": "TextCorrectionZhCorrect", "Version": "2020-09-01"},
+                {},
+                {},
+            ),
+            "TextCorrectionEnCorrect": ApiInfo(
+                "POST",
+                "/",
+                {"Action": "TextCorrectionEnCorrect", "Version": "2020-09-01"},
+                {},
+                {},
+            ),
+            "SentimentAnalysis": ApiInfo(
+                "POST",
+                "/",
+                {"Action": "SentimentAnalysis", "Version": "2020-12-01"},
+                {},
+                {},
+            ),
+            "TextSummarization": ApiInfo(
+                "POST",
+                "/",
+                {"Action": "TextSummarization", "Version": "2020-12-01"},
+                {},
+                {},
+            ),
+            "EssayAutoGrade": ApiInfo(
+                "POST",
+                "/",
+                {"Action": "EssayAutoGrade", "Version": "2021-05-20"},
+                {},
+                {},
+            ),
+            "NovelCorrection": ApiInfo(
+                "POST",
+                "/",
+                {"Action": "NovelCorrection", "Version": "2021-07-22"},
+                {},
+                {},
+            ),
         }
         return api_info
 
@@ -54,7 +100,7 @@ class NLPService(Service):
             try:
                 res_json = json.loads(res)
                 return res_json
-            except:
+            except BaseException:
                 raise Exception(str(e))
 
     def keyphrase_extraction_extract(self, body):

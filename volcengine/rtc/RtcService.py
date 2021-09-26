@@ -1,10 +1,9 @@
-# coding:utf-8
 import json
 import threading
 
 from volcengine.ApiInfo import ApiInfo
-from volcengine.Credentials import Credentials
 from volcengine.base.Service import Service
+from volcengine.Credentials import Credentials
 from volcengine.ServiceInfo import ServiceInfo
 
 
@@ -21,32 +20,45 @@ class RtcService(Service):
     def __init__(self):
         self.service_info = RtcService.get_service_info()
         self.api_info = RtcService.get_api_info()
-        super(RtcService, self).__init__(self.service_info, self.api_info)
+        super().__init__(self.service_info, self.api_info)
 
     @staticmethod
     def get_service_info():
-        service_info = ServiceInfo("open.volcengineapi.com", {'Accept': 'application/json'},
-                                   Credentials('', '', 'rtc', 'cn-north-1'), 5, 5)
+        service_info = ServiceInfo(
+            "open.volcengineapi.com",
+            {"Accept": "application/json"},
+            Credentials("", "", "rtc", "cn-north-1"),
+            5,
+            5,
+        )
         return service_info
 
     @staticmethod
     def get_api_info():
         api_info = {
-            "ListRooms": ApiInfo("GET", "/", {"Action": "ListRooms", "Version": "2020-12-01"}, {}, {}),
-            "ListIndicators": ApiInfo("POST", "/", {"Action": "ListIndicators", "Version": "2020-12-01"}, {}, {}),
+            "ListRooms": ApiInfo(
+                "GET", "/", {"Action": "ListRooms", "Version": "2020-12-01"}, {}, {}
+            ),
+            "ListIndicators": ApiInfo(
+                "POST",
+                "/",
+                {"Action": "ListIndicators", "Version": "2020-12-01"},
+                {},
+                {},
+            ),
         }
         return api_info
 
     def list_rooms(self, params):
         res = self.get("ListRooms", params)
-        if res == '':
+        if res == "":
             raise Exception("ListRooms: empty response")
         res_json = json.loads(res)
         return res_json
 
     def list_indicators(self, body):
         res = self.json("ListIndicators", {}, body)
-        if res == '':
+        if res == "":
             raise Exception("ListIndicators: empty response")
         res_json = json.loads(res)
         return res_json

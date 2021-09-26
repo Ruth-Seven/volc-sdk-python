@@ -1,21 +1,17 @@
 # coding : utf-8
 from collections import OrderedDict
-
-try:
-    from urllib import urlencode
-except:
-    from urllib.parse import urlencode
+from urllib.parse import urlencode
 
 
-class Request(object):
+class Request:
     def __init__(self):
-        self.schema = ''
-        self.method = ''
-        self.host = ''
-        self.path = ''
+        self.schema = ""
+        self.method = ""
+        self.host = ""
+        self.path = ""
         self.headers = OrderedDict()
         self.query = OrderedDict()
-        self.body = ''
+        self.body = ""
         self.form = dict()
         self.connection_timeout = 0
         self.socket_timeout = 0
@@ -48,4 +44,11 @@ class Request(object):
         self.socket_timeout = socket_timeout
 
     def build(self, doseq=0):
-        return self.schema + '://' + self.host + self.path + '?' + urlencode(self.query, doseq)
+        return (
+            self.schema
+            + "://"
+            + self.host
+            + self.path
+            + "?"
+            + urlencode(self.query, doseq)
+        )

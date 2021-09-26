@@ -1,14 +1,11 @@
-# coding:utf-8
-
-
-class MetaData(object):
+class MetaData:
     def __init__(self):
-        self.algorithm = ''
-        self.credential_scope = ''
-        self.signed_headers = ''
-        self.date = ''
-        self.region = ''
-        self.service = ''
+        self.algorithm = ""
+        self.credential_scope = ""
+        self.signed_headers = ""
+        self.date = ""
+        self.region = ""
+        self.service = ""
 
     def set_date(self, date):
         self.date = date

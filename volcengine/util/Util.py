@@ -1,4 +1,3 @@
-# coding:utf-8
 import base64
 import hashlib
 import hmac
@@ -6,40 +5,50 @@ import random
 import sys
 import uuid
 from functools import reduce
+from urllib.parse import quote
+from zlib import crc32
 
 from Crypto.Cipher import AES
 
 from volcengine.const.Const import LETTER_RUNES
-from zlib import crc32
-
-try:
-    from urllib import quote
-except:
-    from urllib.parse import quote
 
 
-class Util(object):
+class Util:
     @staticmethod
     def norm_uri(path):
-        return quote(path).replace('%2F', '/').replace('+', '%20')
+        return quote(path).replace("%2F", "/").replace("+", "%20")
 
     @staticmethod
     def norm_query(params):
-        query = ''
+        query = ""
         for key in sorted(params.keys()):
             if type(params[key]) == list:
                 for k in params[key]:
-                    query = query + quote(key, safe='-_.~') + '=' + quote(k, safe='-_.~') + '&'
+                    query = (
+                        query
+                        + quote(key, safe="-_.~")
+                        + "="
+                        + quote(k, safe="-_.~")
+                        + "&"
+                    )
             else:
-                query = query + quote(key, safe='-_.~') + '=' + quote(params[key], safe='-_.~') + '&'
+                query = (
+                    query
+                    + quote(key, safe="-_.~")
+                    + "="
+                    + quote(params[key], safe="-_.~")
+                    + "&"
+                )
         query = query[:-1]
-        return query.replace('+', '%20')
+        return query.replace("+", "%20")
 
     @staticmethod
     def hmac_sha256(key, content):
         # type(key) == <class 'bytes'>
         if sys.version_info[0] == 3:
-            return hmac.new(key, bytes(content, encoding='utf-8'), hashlib.sha256).digest()
+            return hmac.new(
+                key, bytes(content, encoding="utf-8"), hashlib.sha256
+            ).digest()
         else:
             return hmac.new(key, content, hashlib.sha256).digest()
 
@@ -47,25 +56,27 @@ class Util(object):
     def hmac_sha1(key, content):
         # type(key) == <class 'bytes'>
         if sys.version_info[0] == 3:
-            return hmac.new(key, bytes(content, encoding='utf-8'), hashlib.sha1).digest()
+            return hmac.new(
+                key, bytes(content, encoding="utf-8"), hashlib.sha1
+            ).digest()
         else:
             return hmac.new(key, content, hashlib.sha1).digest()
 
     @staticmethod
     def sha256(content):
         # type(content) == <class 'str'>
-        return hashlib.sha256(content.encode('utf-8')).hexdigest()
+        return hashlib.sha256(content.encode("utf-8")).hexdigest()
 
     @staticmethod
     def to_hex(content):
         lst = []
         for ch in content:
             if sys.version_info[0] == 3:
-                hv = hex(ch).replace('0x', '')
+                hv = hex(ch).replace("0x", "")
             else:
-                hv = hex(ord(ch)).replace('0x', '')
+                hv = hex(ord(ch)).replace("0x", "")
             if len(hv) == 1:
-                hv = '0' + hv
+                hv = "0" + hv
             lst.append(hv)
         return reduce(lambda x, y: x + y, lst)
 
@@ -82,14 +93,20 @@ class Util(object):
     @staticmethod
     def generate_access_key_id(prefix):
         uid = str(uuid.uuid4())
-        uid_base64 = base64.b64encode(uid.replace('-', '').encode(encoding='utf-8'))
+        uid_base64 = base64.b64encode(uid.replace("-", "").encode(encoding="utf-8"))
 
-        s = uid_base64.decode().replace('=', '').replace('/', '').replace('+', '').replace('-', '')
+        s = (
+            uid_base64.decode()
+            .replace("=", "")
+            .replace("/", "")
+            .replace("+", "")
+            .replace("-", "")
+        )
         return prefix + s
 
     @staticmethod
     def rand_string_runes(length):
-        return ''.join(random.sample(list(LETTER_RUNES), length))
+        return "".join(random.sample(list(LETTER_RUNES), length))
 
     @staticmethod
     def aes_encrypt_cbc_with_base64(orig_data, key):
@@ -97,7 +114,7 @@ class Util(object):
         # type(key) == <class 'bytes'>
         generator = AES.new(key, AES.MODE_CBC, key)
         if sys.version_info[0] == 3:
-            crypt = generator.encrypt(Util.pad(orig_data).encode('utf-8'))
+            crypt = generator.encrypt(Util.pad(orig_data).encode("utf-8"))
             return base64.b64encode(crypt).decode()
         else:
             crypt = generator.encrypt(Util.pad(orig_data))
@@ -106,7 +123,7 @@ class Util(object):
     @staticmethod
     def generate_secret_key():
         rand_str = Util.rand_string_runes(32)
-        return Util.aes_encrypt_cbc_with_base64(rand_str, 'bytedance-isgood'.encode('utf-8'))
+        return Util.aes_encrypt_cbc_with_base64(rand_str, b"bytedance-isgood")
 
     @staticmethod
     def crc32(file_path):

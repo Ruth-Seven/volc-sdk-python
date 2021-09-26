@@ -42,7 +42,7 @@ require python verion >= 2.7
       iam_service.set_ak('ak')
       iam_service.set_sk('sk')
   ```
-  
+
 - (option 2) 在当前环境变量中分别设置:
 
   ```bash
@@ -66,7 +66,7 @@ secret_access_key = test_secret_key1
 [default]
 
 [ml_platform]
-region = cn-beijing 
+region = cn-beijing
   ```
 
 ## 地域Region设置
@@ -80,7 +80,7 @@ region = cn-beijing
   ```
 
 - 默认为cn-north-1，如果需要调用其它地域服务，请在初始化函数getInstance中传入指定地域region，例如：
-  
+
   ```
   iam_service = IamService('us-east-1')
   ```

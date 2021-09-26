@@ -1,24 +1,20 @@
-# coding: utf-8
 import json
-import os
 import time
 from collections import OrderedDict
-try:
-    from urllib.parse import urlencode
-except ImportError:
-    from urllib import urlencode
-
+from urllib.parse import urlencode
 
 import requests
 
-from volcengine.Policy import SecurityToken2, InnerToken, ComplexEncoder
+import volcengine.util.Util as Util
+from volcengine import VERSION
 from volcengine.auth.SignerV4 import SignerV4
 from volcengine.base.Request import Request
-from volcengine.util.Util import *
-from volcengine import VERSION
+from volcengine.Policy import ComplexEncoder
+from volcengine.Policy import InnerToken
+from volcengine.Policy import SecurityToken2
 
 
-class Service(object):
+class Service:
     def __init__(self, service_info, api_info):
         self.service_info = service_info
         self.api_info = api_info
@@ -26,8 +22,8 @@ class Service(object):
         self.init()
 
     def init(self):
-       pass 
-    
+        pass
+
     def set_ak(self, ak):
         self.service_info.credentials.set_ak(ak)
 
@@ -64,8 +60,14 @@ class Service(object):
         SignerV4.sign(r, self.service_info.credentials)
 
         url = r.build(doseq)
-        resp = self.session.get(url, headers=r.headers,
-                                timeout=(self.service_info.connection_timeout, self.service_info.socket_timeout))
+        resp = self.session.get(
+            url,
+            headers=r.headers,
+            timeout=(
+                self.service_info.connection_timeout,
+                self.service_info.socket_timeout,
+            ),
+        )
         if resp.status_code == 200:
             return resp.text
         else:
@@ -76,15 +78,22 @@ class Service(object):
             raise Exception("no such api")
         api_info = self.api_info[api]
         r = self.prepare_request(api_info, params)
-        r.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        r.headers["Content-Type"] = "application/x-www-form-urlencoded"
         r.form = self.merge(api_info.form, form)
         r.body = urlencode(r.form, True)
         SignerV4.sign(r, self.service_info.credentials)
 
         url = r.build()
 
-        resp = self.session.post(url, headers=r.headers, data=r.form,
-                                 timeout=(self.service_info.connection_timeout, self.service_info.socket_timeout))
+        resp = self.session.post(
+            url,
+            headers=r.headers,
+            data=r.form,
+            timeout=(
+                self.service_info.connection_timeout,
+                self.service_info.socket_timeout,
+            ),
+        )
         if resp.status_code == 200:
             return resp.text
         else:
@@ -95,21 +104,28 @@ class Service(object):
             raise Exception("no such api")
         api_info = self.api_info[api]
         r = self.prepare_request(api_info, params)
-        r.headers['Content-Type'] = 'application/json'
+        r.headers["Content-Type"] = "application/json"
         r.body = body
 
         SignerV4.sign(r, self.service_info.credentials)
 
         url = r.build()
-        resp = self.session.post(url, headers=r.headers, data=r.body,
-                                 timeout=(self.service_info.connection_timeout, self.service_info.socket_timeout))
+        resp = self.session.post(
+            url,
+            headers=r.headers,
+            data=r.body,
+            timeout=(
+                self.service_info.connection_timeout,
+                self.service_info.socket_timeout,
+            ),
+        )
         if resp.status_code == 200:
             return json.dumps(resp.json())
         else:
             raise Exception(resp.text)
 
     def put(self, url, file_path, headers):
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             resp = self.session.put(url, headers=headers, data=f)
             if resp.status_code == 200:
                 return True, resp.text
@@ -129,7 +145,7 @@ class Service(object):
                 params[key] = str(params[key])
             elif type(params[key]) == list:
                 if not doseq:
-                    params[key] = ','.join(params[key])
+                    params[key] = ",".join(params[key])
 
         connection_timeout = self.service_info.connection_timeout
         socket_timeout = self.service_info.socket_timeout
@@ -141,8 +157,8 @@ class Service(object):
         r.set_socket_timeout(socket_timeout)
 
         mheaders = self.merge(api_info.header, self.service_info.header)
-        mheaders['Host'] = self.service_info.host
-        mheaders['User-Agent'] = 'volc-sdk-python/' + VERSION
+        mheaders["Host"] = self.service_info.host
+        mheaders["User-Agent"] = "volc-sdk-python/" + VERSION
         r.set_headers(mheaders)
 
         mquery = self.merge(api_info.query, params)
@@ -165,10 +181,10 @@ class Service(object):
 
     def sign_sts2(self, policy, expire):
         sk = self.service_info.credentials.sk
-        key = hashlib.md5(sk.encode('utf-8')).digest()
+        key = Util.hashlib.md5(sk.encode("utf-8")).digest()
 
         sts = SecurityToken2()
-        sts.access_key_id = Util.generate_access_key_id('AKTP')
+        sts.access_key_id = Util.generate_access_key_id("AKTP")
         sts.secret_access_key = Util.generate_secret_key()
         now = int(time.time())
         sts.current_time = Service.to_rfc3339(now)
@@ -182,27 +198,39 @@ class Service(object):
         inner_token.lt_access_key_id = self.service_info.credentials.ak
         inner_token.access_key_id = sts.access_key_id
         if policy is None:
-            inner_token.policy_string = ''
+            inner_token.policy_string = ""
         else:
             inner_token.policy_string = json.dumps(
-                policy, cls=ComplexEncoder, sort_keys=True).replace(' ', '')
+                policy, cls=ComplexEncoder, sort_keys=True
+            ).replace(" ", "")
         inner_token.signed_secret_access_key = Util.aes_encrypt_cbc_with_base64(
-            sts.secret_access_key, key)
+            sts.secret_access_key, key
+        )
         inner_token.expired_time = expire
 
-        sign_str = '{}|{}|{}|{}|{}'.format(inner_token.lt_access_key_id, inner_token.access_key_id,
-                                           inner_token.expired_time, inner_token.signed_secret_access_key,
-                                           inner_token.policy_string)
+        sign_str = "{}|{}|{}|{}|{}".format(
+            inner_token.lt_access_key_id,
+            inner_token.access_key_id,
+            inner_token.expired_time,
+            inner_token.signed_secret_access_key,
+            inner_token.policy_string,
+        )
         inner_token.signature = Util.to_hex(Util.hmac_sha256(key, sign_str))
 
-        sts.session_token = 'STS2' + base64.b64encode(
-            json.dumps(inner_token, cls=ComplexEncoder, sort_keys=True).replace(' ', '').encode('utf-8')).decode()
+        sts.session_token = (
+            "STS2"
+            + Util.base64.b64encode(
+                json.dumps(inner_token, cls=ComplexEncoder, sort_keys=True)
+                .replace(" ", "")
+                .encode("utf-8")
+            ).decode()
+        )
         return sts
 
     @staticmethod
     def to_rfc3339(t):
-        format_time = time.strftime('%Y-%m-%dT%H:%M:%S%z', time.localtime(t))
-        pos = format_time.find('+')
+        format_time = time.strftime("%Y-%m-%dT%H:%M:%S%z", time.localtime(t))
+        pos = format_time.find("+")
         if pos == -1:
-            pos = format_time.find('-')
-        return format_time[:pos + 3] + ':' + format_time[pos + 3:pos + 5]
+            pos = format_time.find("-")
+        return format_time[: pos + 3] + ":" + format_time[pos + 3 : pos + 5]

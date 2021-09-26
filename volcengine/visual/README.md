@@ -36,4 +36,3 @@ python volcengine/example/visual/example_bank_card.py
 ## 接口文档
 文档链接请点击[这里](https://www.volcengine.cn/docs)
 并在【视觉智能】列表查看
-

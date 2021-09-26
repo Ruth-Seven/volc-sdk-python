@@ -109,4 +109,4 @@ if __name__ == '__main__':
     # 定额发票OCR
     # resp = visual_service.quota_invoice(form)
 
-    print(resp)
+    # print(resp)
